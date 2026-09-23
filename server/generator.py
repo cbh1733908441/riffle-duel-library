@@ -55,7 +55,7 @@ def prompt_for(context, brief):
         '{{游戏名称，或“游戏A 的X + 游戏B 的Y”这样的组合}}': context['game']['name'],
         '{{例如“保留种植成长，加入异步偷菜”}}': brief or '本案假设：保留所选模式的核心操作和循环，改成一个玩家独立对抗明确标记的 NPC；不依赖人类队友。',
         '{{项目名，例如 Reflow；候选编号，例如“三个候选玩法之一”}}': 'Riffle 选题原型（本案假设）',
-        '{{例如 网页端，单次 2–5 分钟}}': '网页端，单次 2–5 分钟（本案假设）',
+        '{{例如 手机网页端，竖屏 9:16，单次 2–5 分钟}}': '手机网页／Feed 内游戏，竖屏 9:16，单次 2–5 分钟（本案假设；用户明确要求其他平台或画幅时按其要求）',
         '{{官方链接、截图、示意图、你的笔记}}': '见随附 context.json，包含所选模式、全部来源摘录、NPC 评估、其他模式及原始游戏记录。',
         '{{今天日期 YYYY-MM-DD}}': datetime.now().strftime('%Y-%m-%d'),
     }
@@ -193,6 +193,10 @@ def plan_worker(job, initial=False):
                     prompt = ('你是一名游戏策划。读取 context.json、revision-base.md 和 user-current.md。'
                               '依据以下用户要求修改策划。保留未涉及的规则和章节；如用户正文有新修改，以用户正文为准，'
                               '结合候选稿中仍适用的修改。资料事实不得编造，设计数值标原型建议。输出完整中文策划。\n'
+                              '移动端默认：手机网页／Feed 内游戏、竖屏 9:16、触屏操作、单次 2–5 分钟。'
+                              '延续当前方案中明确的用户平台选择；只有用户明确指定时才改为 PC 或横屏。'
+                              '本轮涉及的新增或调整规则需写清触屏手势、镜头和按钮反馈，不新增键鼠依赖。'
+                              '涉及中断时说明切后台暂停／恢复和防重复结算；未涉及的正文不强行重写。\n'
                               '本轮修改要求：\n' + message['text'])
                     stage = 'revising'
                 (job / 'ai-draft.md').write_text('')
@@ -312,7 +316,7 @@ def create_job(body):
         meta = {'id': job.name, 'gameId': game_id, 'modeId': mode_id, 'gameName': context['game']['name'],
                 'brief': brief, 'status': 'queued', 'message': '正在准备策划…', 'planReady': False, 'planRevision': 0,
                 'imageReady': False, 'fingerprint': fingerprint, 'textModel': MODEL,
-                'createdAt': datetime.now().astimezone().isoformat(), 'promptVersion': '2.0',
+                'createdAt': datetime.now().astimezone().isoformat(), 'promptVersion': '2.1-mobile',
                 'sourceSnapshot': context['catalogSnapshot']['builtAt'], 'messages': [], 'versions': [],
                 'imageChannel': 'Codex 原生 image_gen', 'imageModel': '工具未暴露型号选择；未核实 GPT Image 2.5'}
         write_json(job / 'job.json', meta); write_json(job / 'context.json', context)
