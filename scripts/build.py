@@ -79,6 +79,8 @@ def build():
  def stats(ms):return {'modes':len(ms),'games':len({m['gameId'] for m in ms})}
  meta={'builtAt':datetime.now(timezone.utc).isoformat(),'catalogCount':len(games),'analysisCount':sum(bool(g['modes']) for g in games.values()),'modeCount':len(modes),'platforms':{p:{'catalog':sum(g['platform']==p for g in games.values()),'analyzed':sum(g['platform']==p and bool(g['modes']) for g in games.values())} for p in ('steam','roblox')},'scopeCounts':{s:stats([m for m in modes.values() if m['scope']==s]) for s in ('eligible','pending','excluded')},'assessmentCounts':{s:stats([m for m in modes.values() if m['npcSuitability']['level']==s]) for s in ('high','medium','low','unknown','not_applicable')},'sourceBuilds':{'steam':steam['meta']['builtAt'],'roblox':rb['meta']['builtAt']}}
  d={'schemaVersion':1,'meta':meta,'games':list(games.values()),'modes':modes,'categories':list(cats.values()),'templates':templates}
+ (ROOT/'dist/prompts').mkdir(parents=True, exist_ok=True)
+ for prompt in (ROOT/'prompts').glob('*.md'):(ROOT/'dist/prompts'/prompt.name).write_text(prompt.read_text())
  save(ROOT/'dist/library.json',d); (ROOT/'dist/data.js').write_text('window.TOPIC_LIBRARY='+json.dumps(d,ensure_ascii=False,separators=(',',':')).replace('<','\\u003c')+';\n');save(ROOT/'data/summary.json',meta);print(json.dumps(meta,ensure_ascii=False))
 if __name__=='__main__':
  parser=argparse.ArgumentParser();parser.add_argument('--import-local',type=Path);args=parser.parse_args()

@@ -1,0 +1,20 @@
+{
+  "id": "b6d31f91437e489288d2d59be5c1f07b",
+  "gameId": "roblox:universe:4538598064",
+  "modeId": "roblox:universe:4538598064/documented",
+  "gameName": "(UPD) Phantom Ball",
+  "brief": "",
+  "status": "complete",
+  "message": "策划与参考图已生成。",
+  "planReady": true,
+  "imageReady": true,
+  "textModel": "gpt-6-sol",
+  "createdAt": "2026-09-23T17:51:26.858977+08:00",
+  "promptVersion": "1.0",
+  "sourceSnapshot": "2026-09-23T09:31:11.180966+00:00",
+  "imageChannel": "Codex 原生 image_gen",
+  "imageModel": "工具未暴露型号选择；未核实 GPT Image 2.5",
+  "updatedAt": "2026-09-23T18:03:33.091763+08:00",
+  "failedStage": null,
+  "base": "generated/b6d31f91437e489288d2d59be5c1f07b/"
+}

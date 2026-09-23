@@ -1,0 +1,198 @@
+{
+  "game": {
+    "id": "roblox:universe:4538598064",
+    "name": "(UPD) Phantom Ball",
+    "displayName": "(UPD) Phantom Ball",
+    "url": "https://www.roblox.com/games/12979690461",
+    "icon": "https://tr.rbxcdn.com/180DAY-c71d4281a457ac13307a0021adb985d0/150/150/Image/Webp/noFilter",
+    "platform": "roblox",
+    "modes": [
+      "roblox:universe:4538598064/documented"
+    ],
+    "description": "🔥 Welcome to PHANTOM BALL, in this game you'll deflect a ball back and forth to eliminate other players. The last person standing wins!\n\n💎 Earn diamonds and spend them on new items!\n✨ Collect boosts around the map for temporary speed buffs!\n🌠 Level up and achieve different leagues!\n🏆 Show off your wins streak and climb the leaderboards!\n\nCONTROLS:\nBlock - F / Tap / UI Button / Left Click\nAbility 1 - Q / Tap / UI Button\nAbility 2 - 1 / Tap / UI Button\nPassive - Happens automatically\n\n⚠️ Exploiting and auto farming are strictly prohibited! Our anti cheat and moderators will catch you, and you'll permanently banned with no appeal.\n* Macros and Auto Clickers are allowed in the AFK lobby.\n\n🖤 By Jule Games"
+  },
+  "selectedMode": {
+    "slug": "wave600-4538598064",
+    "name": "个人对抗 · (UPD) Phantom Ball",
+    "summary": "反弹来球淘汰对手的生存竞技。",
+    "controls": "官方资料未说明具体键位、触控或界面操作；待核验。",
+    "actions": "观察球向、击回、拾取临时加速。",
+    "rules": "最后存活的人获胜；地图增益提供短时速度。",
+    "result": "赢取钻石用于新物品。",
+    "multiplayer": "反弹球在玩家之间传递，最后存活者获胜。",
+    "variants": [
+      "改编设想：连续反弹改变球速但暴露自己位置。"
+    ],
+    "sources": [
+      {
+        "id": "official",
+        "title": "(UPD) Phantom Ball｜Roblox 官方简介",
+        "url": "https://games.roblox.com/v1/games?universeIds=4538598064",
+        "type": "official",
+        "excerpt": "🔥 Welcome to PHANTOM BALL, in this game you'll deflect a ball back and forth to eliminate other players. The last person standing wins!\n\n💎 Earn diamonds and spend them on new items!\n✨ Collect boosts around the map for temporary speed buffs!\n🌠 Level up and achieve different leagues!\n🏆 Show off your wins streak and climb the leaderboards!\n\nCONTROLS:\nBlock - F / Tap / UI Button / Left Click\nAbility 1 - Q / Tap / UI Button\nAbility 2 - 1 / Tap / UI Button\nPassive - Happens automatically\n\n⚠️ Exploiting and auto farming are strictly prohibited! Our anti cheat and moderators will catch you, and you'll permanently banned with no appeal.\n* Macros and Auto Clickers are allowed in the AFK lobby.\n\n🖤 By Jule Games",
+        "accessedAt": "2026-09-23T06:02:36.167921+00:00",
+        "readAt": "2026-09-23T06:02:36.167921+00:00",
+        "verification": "text_read",
+        "verificationScope": "读取本 Universe 官方 description 原文；未作实机核验。",
+        "gameUrl": "https://www.roblox.com/games/12979690461",
+        "archivePath": "/Users/mima1234/Documents/ChatGPT/解构选题/roblox-library/data/batch-600/a/evidence/4538598064.json"
+      }
+    ],
+    "evidence": {
+      "summary": [
+        "official"
+      ],
+      "controls": [],
+      "actions": [
+        "official"
+      ],
+      "rules": [
+        "official"
+      ],
+      "result": [
+        "official"
+      ],
+      "multiplayer": [
+        "official"
+      ]
+    },
+    "unknowns": [
+      "官方资料未说明具体键位、触控或界面操作；待核验。"
+    ],
+    "batchId": "wave600",
+    "primaryTemplateId": "deflect-targeted-ball",
+    "reviewScope": "Roblox 官方 Universe 资料和 description 的文本解构；未做实机或视频核验；未知项逐字段标注。",
+    "id": "roblox:universe:4538598064/documented",
+    "gameId": "roblox:universe:4538598064",
+    "platform": "roblox",
+    "scope": "eligible",
+    "sourceId": "universe:4538598064",
+    "npcSuitability": {
+      "level": "high",
+      "scope": "independent",
+      "reason": "共享危险的去向由每次操作改变，适合用少量明确行为验证 NPC 对抗。",
+      "npcTasks": "识别自己何时受威胁，按可见状态决定应对和传递时机。",
+      "risks": "反应窗口、目标选择与失误率需要原型调试，不能让 NPC 瞬间反应。",
+      "prototype": "先保留一个危险物和基础传递，验证压力如何在参与者之间变化。",
+      "reviewMethod": "mode_text_review",
+      "playtestStatus": "untested",
+      "nativeBotSupport": "not_assessed",
+      "sourceIds": [
+        "official"
+      ],
+      "basis": "逐卡阅读现有文本后的设计判断；未经 NPC 原型或趣味性测试。",
+      "evaluatedAt": "2026-09-23",
+      "modeName": "个人对抗 · (UPD) Phantom Ball",
+      "templateId": "relay"
+    },
+    "originalTemplates": [
+      {
+        "id": "deflect-targeted-ball",
+        "name": "识别来球、反击转移、淘汰对手",
+        "category": "combat",
+        "description": "在被球选中时及时格挡，将球转向其他玩家，争取不被击中。",
+        "scope": "反弹来球淘汰对手的生存竞技。"
+      }
+    ],
+    "templateId": "relay",
+    "minPlayers": null,
+    "maxPlayers": null,
+    "participation": [],
+    "relationships": [],
+    "status": "text_reviewed",
+    "playerCountNote": "原资料未按模式确认人数；服务器容量不作为参与人数。"
+  },
+  "otherModesForBackgroundOnly": [],
+  "templates": [
+    {
+      "id": "relay",
+      "category": "space",
+      "name": "共享威胁与传递",
+      "description": "把同一个危险物或倒计时压力传给另一位参与者。",
+      "npcTask": "NPC 需要识别威胁、判断传递时机，不能提前知道隐藏目标。"
+    }
+  ],
+  "originalGameRecord": {
+    "placeId": "12979690461",
+    "placeIds": [
+      "12979690461"
+    ],
+    "universeId": "4538598064",
+    "name": "(UPD) Phantom Ball",
+    "icon": "https://tr.rbxcdn.com/180DAY-c71d4281a457ac13307a0021adb985d0/150/150/Image/Webp/noFilter",
+    "catalogSeenAt": "2026-09-21T10:29:43+00:00",
+    "catalogSource": "https://api.rolimons.com/games/v1/gamelist",
+    "id": "universe:4538598064",
+    "url": "https://www.roblox.com/games/12979690461",
+    "description": "🔥 Welcome to PHANTOM BALL, in this game you'll deflect a ball back and forth to eliminate other players. The last person standing wins!\n\n💎 Earn diamonds and spend them on new items!\n✨ Collect boosts around the map for temporary speed buffs!\n🌠 Level up and achieve different leagues!\n🏆 Show off your wins streak and climb the leaderboards!\n\nCONTROLS:\nBlock - F / Tap / UI Button / Left Click\nAbility 1 - Q / Tap / UI Button\nAbility 2 - 1 / Tap / UI Button\nPassive - Happens automatically\n\n⚠️ Exploiting and auto farming are strictly prohibited! Our anti cheat and moderators will catch you, and you'll permanently banned with no appeal.\n* Macros and Auto Clickers are allowed in the AFK lobby.\n\n🖤 By Jule Games",
+    "playing": 512,
+    "visits": 216542037,
+    "maxPlayers": 14,
+    "created": "2023-04-02T16:18:53.093Z",
+    "updated": "2026-09-10T02:50:46.506Z",
+    "favoritedCount": 3901623,
+    "creator": "Jule Games",
+    "genre": "Action",
+    "subgenre": "Battlegrounds & Fighting",
+    "officialFetchedAt": "2026-09-21T10:38:59+00:00",
+    "officialSource": "https://games.roblox.com/v1/games?universeIds=4538598064",
+    "displayName": "(UPD) Phantom Ball",
+    "analysisStatus": "deconstructed"
+  },
+  "catalogSnapshot": {
+    "builtAt": "2026-09-23T09:31:11.180966+00:00",
+    "catalogCount": 8749,
+    "analysisCount": 1530,
+    "modeCount": 1552,
+    "platforms": {
+      "steam": {
+        "catalog": 1238,
+        "analyzed": 500
+      },
+      "roblox": {
+        "catalog": 7511,
+        "analyzed": 1030
+      }
+    },
+    "scopeCounts": {
+      "eligible": {
+        "modes": 105,
+        "games": 102
+      },
+      "pending": {
+        "modes": 857,
+        "games": 855
+      },
+      "excluded": {
+        "modes": 590,
+        "games": 578
+      }
+    },
+    "assessmentCounts": {
+      "high": {
+        "modes": 10,
+        "games": 10
+      },
+      "medium": {
+        "modes": 70,
+        "games": 68
+      },
+      "low": {
+        "modes": 25,
+        "games": 25
+      },
+      "unknown": {
+        "modes": 857,
+        "games": 855
+      },
+      "not_applicable": {
+        "modes": 590,
+        "games": 578
+      }
+    },
+    "sourceBuilds": {
+      "steam": "2026-09-23T06:54:42+00:00",
+      "roblox": "2026-09-23T06:12:18+00:00"
+    }
+  }
+}
