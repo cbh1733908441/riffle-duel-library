@@ -8,6 +8,7 @@ job=ROOT/'.local/jobs'/sys.argv[1];meta=json.loads((job/'job.json').read_text())
 if meta['status']!='complete':raise SystemExit('只能发布完整完成的任务')
 base=ROOT/'dist/generated';target=base/job.name;target.mkdir(parents=True,exist_ok=True)
 for name in ['plan.md','reference.png','image-prompt.md','context.json','planning-input.md']:shutil.copy2(job/name,target/name)
+if (job/'image-template.md').exists():shutil.copy2(job/'image-template.md',target/'image-template.md')
 meta={k:v for k,v in meta.items() if k not in {'fingerprint','error'}};meta['base']='generated/'+job.name+'/'
 (target/'manifest.json').write_text(json.dumps(meta,ensure_ascii=False,indent=2))
 index=base/'index.json';items=json.loads(index.read_text()) if index.exists() else []

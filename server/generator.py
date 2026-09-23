@@ -20,7 +20,7 @@ PROCESSES = set()
 CATALOG = json.loads((DIST / 'library.json').read_text())
 GAMES = {g['id']: g for g in CATALOG['games']}
 REQUIRED = ['## 一句话玩法', '## 核心乐趣与目标', '## 用户体验', '## 核心玩法循环', '## 关键玩法细节', '## 首版制作范围', '## 原作参考与改编边界']
-FILES = {'plan.md', 'reference.png', 'image-prompt.md', 'context.json', 'planning-input.md'}
+FILES = {'image-template.md', 'plan.md', 'reference.png', 'image-prompt.md', 'context.json', 'planning-input.md'}
 
 
 def read_json(p):
@@ -97,6 +97,19 @@ def run_cli(job, prompt, output, stage):
             raise RuntimeError('Codex 本步骤未完成。请确认本机已登录且额度可用后重试；本地日志已保留。')
 
 
+def image_template(value=None):
+    if value is None: return (ROOT / 'prompts/reference-image.md').read_text()
+    if not isinstance(value, str) or not value.strip(): raise ValueError('生图提示词不能为空')
+    if len(value) > 16000: raise ValueError('生图提示词最多 16000 字')
+    return value
+
+
+def render_image_prompt(template, plan):
+    # Insert the plan last so placeholder-looking text in the plan remains untouched.
+    text = template.replace('{{平台与画幅；未指定时为网页端、16:9 横屏}}', '网页端，16:9 横屏').replace('{{用户指定风格、角色或参考图；未填时按策划确定}}', '按策划确定；默认简洁风格化 3D，易于 three.js 与 Blender 原型实现。')
+    return text.replace('{{完整策划案}}', plan) if '{{完整策划案}}' in text else text + '\n\n# 完整策划案（自动附加）\n\n' + plan
+
+
 def generate(job, image_only=False):
     try:
         if not image_only:
@@ -106,7 +119,9 @@ def generate(job, image_only=False):
             if any(h not in plan for h in REQUIRED) or len(plan) < 1000:
                 raise RuntimeError('策划未通过章节完整性检查，已保留草稿，请重试。')
         plan = (job / 'plan.md').read_text()
-        image_prompt = (ROOT / 'prompts/reference-image.md').read_text().replace('{{完整策划案}}', plan).replace('{{平台与画幅；未指定时为网页端、16:9 横屏}}', '网页端，16:9 横屏').replace('{{用户指定风格、角色或参考图；未填时按策划确定}}', '按策划确定；默认简洁风格化 3D，易于 three.js 与 Blender 原型实现。')
+        template_path = job / 'image-template.md'
+        if not template_path.exists(): template_path.write_text(image_template())
+        image_prompt = render_image_prompt(template_path.read_text(), plan)
         (job / 'image-prompt.md').write_text(image_prompt)
         previous_image = job / 'reference.png'
         if previous_image.exists(): previous_image.rename(job / ('reference-' + str(time.time_ns()) + '.png'))
@@ -128,8 +143,9 @@ def create_job(body):
     game_id, mode_id = body.get('gameId'), body.get('modeId') or None
     brief = body.get('brief', '')
     if not isinstance(brief, str) or len(brief) > 4000: raise ValueError('改编要求最多 4000 字')
+    template = image_template(body.get('imagePrompt'))
     context = context_for(game_id, mode_id)
-    fingerprint = hashlib.sha256(json.dumps([game_id, mode_id, brief], ensure_ascii=False).encode()).hexdigest()
+    fingerprint = hashlib.sha256(json.dumps([game_id, mode_id, brief, template], ensure_ascii=False).encode()).hexdigest()
     with LOCK:
         for path in JOBS.glob('*/job.json'):
             m = read_json(path)
@@ -141,8 +157,9 @@ def create_job(body):
         meta = {'id': job.name, 'gameId': game_id, 'modeId': mode_id, 'gameName': context['game']['name'],
                 'brief': brief, 'status': 'queued', 'message': '已加入生成队列', 'planReady': False, 'imageReady': False,
                 'fingerprint': fingerprint, 'textModel': MODEL, 'createdAt': datetime.now().astimezone().isoformat(),
-                'promptVersion': '1.0', 'sourceSnapshot': context['catalogSnapshot']['builtAt'],
+                'promptVersion': '1.1', 'imagePromptCustomized': template != image_template(), 'sourceSnapshot': context['catalogSnapshot']['builtAt'],
                 'imageChannel': 'Codex 原生 image_gen', 'imageModel': '工具未暴露型号选择；未核实 GPT Image 2.5'}
+        (job / 'image-template.md').write_text(template)
         write_json(job / 'job.json', meta)
         write_json(job / 'context.json', context)
         (job / 'planning-input.md').write_text(prompt_for(context, brief))
@@ -183,7 +200,7 @@ class Handler(SimpleHTTPRequestHandler):
             return super().do_GET()
         if url.path == '/api/session':
             if not self.allowed(): return self.json({'error': '来源不允许'}, 403)
-            return self.json({'token': TOKEN, 'ready': Path(CLI).exists(), 'textModel': MODEL, 'imageChannel': 'Codex 原生 image_gen', 'modelSelectable': False})
+            return self.json({'token': TOKEN, 'ready': Path(CLI).exists(), 'textModel': MODEL, 'imageChannel': 'Codex 原生 image_gen', 'modelSelectable': False, 'imagePromptConfig': True})
         if not self.authorized(): return self.json({'error': '连接已过期，请重新连接'}, 403)
         if url.path == '/api/jobs':
             q = parse_qs(url.query)
@@ -203,7 +220,7 @@ class Handler(SimpleHTTPRequestHandler):
         try:
             if self.headers.get('Content-Type', '').split(';')[0] != 'application/json': raise ValueError('需要 JSON')
             size = int(self.headers.get('Content-Length', '0'))
-            if not 0 < size <= 20000: raise ValueError('请求大小不允许')
+            if not 0 < size <= 120000: raise ValueError('请求大小不允许')
             body = json.loads(self.rfile.read(size))
             if not isinstance(body, dict): raise ValueError('请求格式错误')
             if self.path == '/api/jobs': return self.json(create_job(body), 202)
@@ -214,6 +231,12 @@ class Handler(SimpleHTTPRequestHandler):
                 meta = read_json(job / 'job.json')
                 if meta['status'] != 'failed': raise ValueError('只能重试失败步骤')
                 if any(read_json(p)['status'] in {'planning', 'imaging', 'queued'} for p in JOBS.glob('*/job.json')): raise ValueError('已有任务在生成')
+                if 'imagePrompt' in body:
+                    template = image_template(body['imagePrompt'])
+                    path = job / 'image-template.md'
+                    if path.exists(): path.rename(job / (str(time.time_ns()) + '-image-template.md'))
+                    path.write_text(template)
+                    update(job, imagePromptCustomized=template != image_template(), fingerprint=hashlib.sha256(json.dumps([meta['gameId'], meta.get('modeId'), meta.get('brief', ''), template], ensure_ascii=False).encode()).hexdigest())
                 update(job, status='queued', message='正在准备重试未完成步骤…', error=None)
                 threading.Thread(target=generate, args=(job, meta.get('planReady', False)), daemon=True).start()
                 return self.json(read_json(job / 'job.json'), 202)
