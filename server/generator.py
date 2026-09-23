@@ -107,6 +107,7 @@ def image_template(value=None):
 def render_image_prompt(template, plan):
     # Insert the plan last so placeholder-looking text in the plan remains untouched.
     text = template.replace('{{平台与画幅；未指定时为网页端、16:9 横屏}}', '网页端，16:9 横屏').replace('{{用户指定风格、角色或参考图；未填时按策划确定}}', '按策划确定；默认简洁风格化 3D，易于 three.js 与 Blender 原型实现。')
+    text = text.replace('{{风格、角色或参考图；未填时按策划确定}}', '按策划确定；未指定时采用简洁的风格化 3D。')
     return text.replace('{{完整策划案}}', plan) if '{{完整策划案}}' in text else text + '\n\n# 完整策划案（自动附加）\n\n' + plan
 
 

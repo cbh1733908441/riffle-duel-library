@@ -47,6 +47,17 @@ class GenerationTests(unittest.TestCase):
   for invalid in ['', '   ', [], '字'*16001]:
    with self.assertRaises(ValueError):g.image_template(invalid)
 
+ def test_portrait_default_render(self):
+  template=g.image_template()
+  self.assertEqual(template,(ROOT/'dist/prompts/reference-image.md').read_text())
+  rendered=g.render_image_prompt(template,'唯一策划正文')
+  self.assertIn('手机竖屏（9:16）',rendered)
+  self.assertIn('画面内所有文字使用英文',rendered)
+  self.assertNotIn('{{',rendered)
+  self.assertNotIn('16:9',rendered)
+  self.assertEqual(rendered.count('唯一策划正文'),1)
+  self.assertIn('按策划确定；未指定时采用简洁的风格化 3D。',rendered)
+
  def test_http_origin_host_and_authorization(self):
   server=g.ThreadingHTTPServer(('127.0.0.1',0),g.Handler);oldport=g.PORT;oldorigins=g.ORIGINS;g.PORT=server.server_address[1];origin=f'http://127.0.0.1:{g.PORT}';g.ORIGINS={origin};threading.Thread(target=server.serve_forever,daemon=True).start()
   def call(path,headers={},data=None):

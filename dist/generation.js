@@ -5,15 +5,32 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const $=s=>document.querySelector(s);
 
 let defaultImagePromptPromise;
-function defaultImagePrompt(){if(!defaultImagePromptPromise)defaultImagePromptPromise=fetch('prompts/reference-image.md').then(r=>{if(!r.ok)throw Error('默认提示词加载失败');return r.text();}).catch(e=>{defaultImagePromptPromise=null;throw e;});return defaultImagePromptPromise;}
+function defaultImagePrompt(){if(!defaultImagePromptPromise)defaultImagePromptPromise=fetch('prompts/reference-image.md?v=20260923-portrait-en').then(r=>{if(!r.ok)throw Error('默认提示词加载失败');return r.text();}).catch(e=>{defaultImagePromptPromise=null;throw e;});return defaultImagePromptPromise;}
 function currentImagePrompt(){const field=$('#gen-image-prompt');if(!field||field.disabled)throw Object.assign(Error('生图提示词尚未加载，请稍后重试或恢复默认。'),{connected:true});if(!field.value.trim())throw Object.assign(Error('请填写生图提示词，或点击恢复默认。'),{connected:true});return field.value;}
+// Only migrate the exact previous default; customized prompts remain overrides.
+const LEGACY_IMAGE_DEFAULT_SHA256='8252db12c4893c9e5fecfe236c6b613f0dcc9fc56332505d32f647fa39f77056';
+async function isLegacyImageDefault(text){
+ if(text===null)return false;
+ const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text.trim()));
+ return Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('')===LEGACY_IMAGE_DEFAULT_SHA256;
+}
 async function initImageEditor(gameId,modeId,id){
  const key='riffle.imagePrompt.v1:'+gameId+'/'+modeId,field=$('#gen-image-prompt'),note=$('#gen-image-prompt-status');
- function save(){try{localStorage.setItem(key,field.value);note.textContent='已自动保存 · 仅当前浏览器、当前游戏模式';}catch{note.textContent='浏览器未允许保存；本次生成仍会使用当前内容。';}}
+ let baseline=null;
+ function save(){try{if(field.value===baseline)localStorage.removeItem(key);else localStorage.setItem(key,field.value);note.textContent=field.value===baseline?'使用默认提示词 · 手机竖屏 9:16、英文界面':'已自动保存 · 仅当前浏览器、当前游戏模式';}catch{note.textContent='浏览器未允许保存；本次生成仍会使用当前内容。';}}
  field.oninput=save;
- $('#gen-image-reset').onclick=async()=>{try{const text=await defaultImagePrompt();if(id!==epoch)return;field.value=text;field.disabled=false;save();}catch(e){if(id===epoch)note.textContent=e.message+'，请再试一次。';}};
- try{let saved=null;try{saved=localStorage.getItem(key);}catch{}const text=saved!==null?saved:await defaultImagePrompt();if(id!==epoch)return;field.value=text;field.disabled=false;note.textContent=saved!==null?'已恢复当前游戏模式的配置':'使用默认提示词 · 修改后自动保存在当前浏览器';}
- catch(e){if(id===epoch)note.textContent=e.message+'，点击恢复默认重新加载。';}
+ $('#gen-image-reset').onclick=async()=>{try{const text=await defaultImagePrompt();if(id!==epoch)return;baseline=text;field.value=text;field.disabled=false;save();}catch(e){if(id===epoch)note.textContent=e.message+'，请再试一次。';}};
+ try{
+  let saved=null;try{saved=localStorage.getItem(key);}catch{}
+  const migrate=await isLegacyImageDefault(saved);
+  const useDefault=saved===null||migrate;
+  const text=useDefault?await defaultImagePrompt():saved;
+  if(id!==epoch)return;
+  if(useDefault)baseline=text;
+  field.value=text;field.disabled=false;
+  if(migrate){try{localStorage.removeItem(key);}catch{}}
+  note.textContent=useDefault?'使用默认提示词 · 手机竖屏 9:16、英文界面':'已恢复当前游戏模式的自定义配置';
+ }catch(e){if(id===epoch)note.textContent=e.message+'，点击恢复默认重新加载。';}
 }
 
 function reset(){clearTimeout(pollTimer);urls.forEach(URL.revokeObjectURL);urls=[];epoch++;busy=false;lastSignature='';}
